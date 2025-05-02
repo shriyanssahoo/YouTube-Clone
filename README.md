@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # YouTube Clone
 
 A modern YouTube clone built with React, TypeScript, and Tailwind CSS, featuring a sleek dark theme and smooth animations.
@@ -128,3 +129,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - YouTube for inspiration
 - All contributors who have helped shape this project
 - The React and TypeScript communities 
+=======
+# YouTube-Clone
+A clone of YouTube with an extra feature (YouTube Classroom) added
+>>>>>>> b12dbb4605bad169aea93a76f700d449751c3c1a
