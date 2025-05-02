@@ -1,4 +1,4 @@
-import React from 'react'
+// import React from 'react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import SchoolIcon from '@mui/icons-material/School'
@@ -8,11 +8,8 @@ import TimelineIcon from '@mui/icons-material/Timeline'
 import SettingsIcon from '@mui/icons-material/Settings'
 import ChecklistIcon from '@mui/icons-material/Checklist'
 import AddIcon from '@mui/icons-material/Add'
-import FilterListIcon from '@mui/icons-material/FilterList'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep'
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface Todo {
@@ -255,19 +252,6 @@ const YouTubeClassroom = () => {
     visible: { height: 'auto', opacity: 1 },
     exit: { height: 0, opacity: 0 }
   }
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % totalSlides)
-  }
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides)
-  }
-
-  const visibleCourses = courses.slice(
-    currentSlide * slidesPerView,
-    (currentSlide + 1) * slidesPerView
-  )
 
   return (
     <div className="p-6">

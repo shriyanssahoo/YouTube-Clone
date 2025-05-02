@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLikedVideosStore } from '../store/likedVideosStore'
 import DeleteIcon from '@mui/icons-material/Delete'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 
 const LikedVideos = () => {
@@ -39,15 +38,6 @@ const LikedVideos = () => {
 
   const handleUnlike = (videoId: string) => {
     removeLikedVideo(videoId)
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
   }
 
   return (

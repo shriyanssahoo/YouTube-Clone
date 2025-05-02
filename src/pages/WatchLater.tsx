@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import DeleteIcon from '@mui/icons-material/Delete'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 
 const WatchLater = () => {
   const [videos] = useState([
@@ -38,15 +36,6 @@ const WatchLater = () => {
   const handleRemoveFromWatchLater = (videoId: string) => {
     // TODO: Implement remove from watch later functionality
     console.log('Remove from watch later:', videoId)
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
   }
 
   return (

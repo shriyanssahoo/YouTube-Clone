@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 
 interface Video {
@@ -19,14 +18,9 @@ interface Channel {
 }
 
 const Channel = () => {
-  const { id } = useParams()
-  const [channel, setChannel] = useState<Channel>({
-    name: 'Channel Name',
-    avatar: 'https://picsum.photos/seed/channel/100/100',
-    subscribers: '1.2M subscribers',
-    description: 'This is a detailed description of the channel...',
-    banner: 'https://picsum.photos/seed/banner/1200/200',
-  })
+  // Remove unused declarations
+  // const { id } = useParams()
+  // const [channel, setChannel] = useState(null)
 
   const [videos, setVideos] = useState<Video[]>([])
 
@@ -47,8 +41,8 @@ const Channel = () => {
     <div>
       <div className="relative">
         <img
-          src={channel.banner}
-          alt={channel.name}
+          src="https://picsum.photos/seed/banner/1200/200"
+          alt="Channel Banner"
           className="w-full h-48 object-cover"
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent h-24" />
@@ -57,13 +51,13 @@ const Channel = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center space-x-4 -mt-16 mb-8">
           <img
-            src={channel.avatar}
-            alt={channel.name}
+            src="https://picsum.photos/seed/channel/100/100"
+            alt="Channel Avatar"
             className="w-32 h-32 rounded-full border-4 border-youtube-black"
           />
           <div>
-            <h1 className="text-2xl font-bold">{channel.name}</h1>
-            <p className="text-gray-400">{channel.subscribers}</p>
+            <h1 className="text-2xl font-bold">Channel Name</h1>
+            <p className="text-gray-400">1.2M subscribers</p>
           </div>
           <button className="ml-auto bg-red-600 text-white px-6 py-2 rounded-full">
             Subscribe
@@ -72,7 +66,7 @@ const Channel = () => {
 
         <div className="mb-8">
           <h2 className="text-xl font-bold mb-2">About</h2>
-          <p className="text-gray-400">{channel.description}</p>
+          <p className="text-gray-400">This is a detailed description of the channel...</p>
         </div>
 
         <div>

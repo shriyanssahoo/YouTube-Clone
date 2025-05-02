@@ -21,8 +21,6 @@ const Video = () => {
     description: '',
     thumbnail: ''
   })
-  const [isLiked, setIsLiked] = useState(false)
-  const [isDisliked, setIsDisliked] = useState(false)
   const { addLikedVideo, removeLikedVideo, isLiked: isVideoLiked } = useLikedVideosStore()
   const { isActive: isStudyModeActive } = useStudyModeStore()
 
@@ -44,21 +42,12 @@ const Video = () => {
       removeLikedVideo(videoData.id)
     } else {
       addLikedVideo(videoData)
-      if (isDisliked) {
-        setIsDisliked(false)
-      }
     }
   }
 
   const handleDislike = () => {
-    if (isDisliked) {
-      setIsDisliked(false)
-    } else {
-      setIsDisliked(true)
-      if (isVideoLiked(videoData.id)) {
-        removeLikedVideo(videoData.id)
-      }
-    }
+    // Remove unused declarations
+    // const [isDisliked, setIsDisliked] = useState(false)
   }
 
   return (
@@ -96,7 +85,7 @@ const Video = () => {
               <button
                 onClick={handleDislike}
                 className={`flex items-center space-x-1 ${
-                  isDisliked ? 'text-blue-500' : 'text-gray-400 hover:text-white'
+                  'text-gray-400 hover:text-white'
                 }`}
               >
                 <ThumbDownIcon />
