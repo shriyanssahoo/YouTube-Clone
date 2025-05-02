@@ -249,120 +249,185 @@ const StudyMode = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex items-center space-x-2 bg-youtube-gray bg-opacity-20 px-4 py-2 rounded-full -ml-1"
+          className="ml-4 flex items-center space-x-2"
         >
-          <AccessTimeIcon className="text-youtube-red" />
-          <span className="text-2xl font-mono font-bold tracking-wider">{currentTime}</span>
+          <AccessTimeIcon className="text-gray-400" />
+          <span className="text-gray-400">{currentTime}</span>
         </motion.div>
       </div>
 
       {/* Main Content */}
-      <div className="pt-28 flex h-[calc(100vh-5rem)]">
-        {/* Video and Left Panel */}
-        <div className="flex-1 p-6">
+      <div className="pt-24 px-4">
+        <div className="max-w-7xl mx-auto">
           {/* Video Player */}
-          <div className="relative">
+          <div className="aspect-video bg-black rounded-lg overflow-hidden mb-8">
             <YouTube
               videoId={videoId}
               onReady={onPlayerReady}
               opts={{
+                height: '100%',
                 width: '100%',
-                height: '600',
                 playerVars: {
                   autoplay: 1,
                   modestbranding: 1,
                   rel: 0
                 }
               }}
-              className="rounded-lg overflow-hidden"
             />
           </div>
 
-          {/* Video Title */}
-          <div className="mt-4 px-2">
-            <h1 className="text-2xl font-semibold text-white">{videoTitle}</h1>
-          </div>
+          {/* Study Tools */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column - Notes and Todo List */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Tabs */}
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => setActiveTab('notes')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
+                    activeTab === 'notes'
+                      ? 'bg-youtube-red text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <NoteIcon />
+                  <span>Notes</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('todo')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
+                    activeTab === 'todo'
+                      ? 'bg-youtube-red text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <ChecklistIcon />
+                  <span>To-Do List</span>
+                </button>
+              </div>
 
-          {/* Bookmark Button */}
-          <div className="mt-4 flex justify-end">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={addBookmark}
-              className="bg-youtube-red text-white px-4 py-2 rounded-full flex items-center space-x-2"
-            >
-              <BookmarkIcon />
-              <span>Bookmark</span>
-            </motion.button>
-          </div>
+              {/* Notes Tab Content */}
+              {activeTab === 'notes' && (
+                <div className="space-y-4">
+                  <div className="flex space-x-2">
+                    <textarea
+                      ref={textareaRef}
+                      value={currentNote}
+                      onChange={(e) => setCurrentNote(e.target.value)}
+                      placeholder="Take notes..."
+                      className="flex-grow bg-youtube-gray text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red min-h-[100px]"
+                    />
+                    <button
+                      onClick={saveNote}
+                      className="bg-youtube-red text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                    >
+                      <SaveIcon />
+                    </button>
+                  </div>
 
-          {/* Bookmarks Panel */}
-          {bookmarks.length > 0 && (
-            <div className="mt-4 p-4 bg-youtube-gray rounded-lg">
-              <h3 className="text-lg font-medium mb-3">Bookmarks</h3>
+                  <div className="space-y-2">
+                    {notes.map((note) => (
+                      <div
+                        key={note.id}
+                        className="bg-youtube-gray p-4 rounded-lg"
+                      >
+                        <p className="text-white whitespace-pre-wrap">{note.content}</p>
+                        {note.timestamp && (
+                          <div className="mt-2 text-sm text-gray-400">
+                            Timestamp: {formatTime(note.timestamp)}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Todo List Tab Content */}
+              {activeTab === 'todo' && (
+                <div className="space-y-4">
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Add a new task..."
+                      className="flex-grow bg-youtube-gray text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red"
+                    />
+                    <button
+                      onClick={addTodo}
+                      className="bg-youtube-red text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                    >
+                      <AddIcon />
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    {todos.map((todo) => (
+                      <div
+                        key={todo.id}
+                        className="flex items-center space-x-3 p-3 bg-youtube-gray rounded-lg"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={todo.completed}
+                          onChange={() => toggleTodo(todo.id)}
+                          className="w-5 h-5 rounded border-gray-600 text-youtube-red focus:ring-youtube-red"
+                        />
+                        <input
+                          type="text"
+                          value={todo.text}
+                          onChange={(e) => updateTodoText(todo.id, e.target.value)}
+                          placeholder="Enter task..."
+                          className="flex-1 bg-transparent border-none focus:outline-none text-white placeholder-gray-500"
+                        />
+                        {todo.timestamp && (
+                          <button
+                            onClick={() => playerRef.current?.seekTo(todo.timestamp)}
+                            className="text-gray-400 hover:text-white"
+                          >
+                            {formatTime(todo.timestamp)}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column - Bookmarks */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Bookmarks</h3>
+                <button
+                  onClick={addBookmark}
+                  className="bg-youtube-red text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                >
+                  <BookmarkIcon />
+                </button>
+              </div>
+
               <div className="space-y-2">
-                {bookmarks.map(bookmark => (
-                  <motion.button
+                {bookmarks.map((bookmark) => (
+                  <div
                     key={bookmark.id}
-                    whileHover={{ scale: 1.02 }}
-                    onClick={() => playerRef.current?.seekTo(bookmark.timestamp)}
-                    className="w-full text-left p-2 hover:bg-gray-700 rounded flex items-center space-x-2"
+                    className="flex items-center justify-between p-3 bg-youtube-gray rounded-lg"
                   >
-                    <BookmarkIcon className="text-youtube-red" />
-                    <span>{bookmark.label}</span>
-                  </motion.button>
+                    <span className="text-white">{bookmark.label}</span>
+                    <button
+                      onClick={() => playerRef.current?.seekTo(bookmark.timestamp)}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      {formatTime(bookmark.timestamp)}
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
-          )}
-        </div>
-
-        {/* Right Panel */}
-        <div className="w-96 border-l border-gray-800 flex flex-col">
-          {/* Tabs */}
-          <div className="flex border-b border-gray-800">
-            <button
-              onClick={() => setActiveTab('notes')}
-              className={`flex-1 py-4 flex items-center justify-center space-x-2 ${
-                activeTab === 'notes' ? 'text-white border-b-2 border-youtube-red' : 'text-gray-400'
-              }`}
-            >
-              <NoteIcon />
-              <span>Notes</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('todo')}
-              className={`flex-1 py-4 flex items-center justify-center space-x-2 ${
-                activeTab === 'todo' ? 'text-white border-b-2 border-youtube-red' : 'text-gray-400'
-              }`}
-            >
-              <ChecklistIcon />
-              <span>To-Do List</span>
-            </button>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-          {/* Notes Tab Content */}
-          {activeTab === 'notes' && (
-            <div className="flex-1 flex flex-col min-h-0">
-              <div className="p-4 border-b border-gray-800">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium">Notes</h3>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-youtube-red text-white px-3 py-1 rounded-full flex items-center space-x-1"
-                  >
-                    <AddIcon />
-                    <span>Add Clip</span>
-                  </motion.button>
-                </div>
-                
-                {/* Note Input */}
-                <div className="mb-4">
-                  {/* Formatting Toolbar */}
-                  <div className="flex space-x-2 mb-2 p-2 bg-youtube-gray rounded-t-lg border-b border-gray-700">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => applyFormat('bold')}
-                      className={`
+export default StudyMode;
