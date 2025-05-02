@@ -10,6 +10,9 @@ import SaveIcon from '@mui/icons-material/Save';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
 import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import YouTube from 'react-youtube';
 import { useSidebarStore } from '../store/sidebarStore';
 
@@ -40,6 +43,15 @@ interface Todo {
   videoTitle?: string;
 }
 
+interface RelatedVideo {
+  id: string;
+  title: string;
+  thumbnail: string;
+  channelTitle: string;
+  viewCount: string;
+  publishedAt: string;
+}
+
 const StudyMode = () => {
   const { videoId } = useParams();
   const navigate = useNavigate();
@@ -56,6 +68,9 @@ const StudyMode = () => {
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [relatedVideos, setRelatedVideos] = useState<RelatedVideo[]>([]);
+  const [showRelatedVideos, setShowRelatedVideos] = useState(false);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   // Load saved data when component mounts
   useEffect(() => {
@@ -120,6 +135,12 @@ const StudyMode = () => {
     // Get video title when player is ready
     const title = event.target.getVideoData().title;
     setVideoTitle(title);
+    // Ensure video starts playing
+    event.target.playVideo();
+  };
+
+  const onPlayerError = (error: any) => {
+    console.error('YouTube Player Error:', error);
   };
 
   const addBookmark = () => {
@@ -234,6 +255,77 @@ const StudyMode = () => {
     }, 0);
   };
 
+  const scrollSlider = (direction: 'left' | 'right') => {
+    if (sliderRef.current) {
+      const scrollAmount = 400;
+      const currentScroll = sliderRef.current.scrollLeft;
+      const newScroll = direction === 'left' 
+        ? currentScroll - scrollAmount 
+        : currentScroll + scrollAmount;
+      
+      sliderRef.current.scrollTo({
+        left: newScroll,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const fetchRelatedVideos = () => {
+    // Mock data for related videos
+    const dataScienceVideos = [
+      {
+        id: 'aircAruvnKk',
+        title: '3Blue1Brown - Neural Networks',
+        thumbnail: 'https://img.youtube.com/vi/aircAruvnKk/maxresdefault.jpg',
+        channelTitle: '3Blue1Brown',
+        viewCount: '12M',
+        publishedAt: '2017-10-05'
+      },
+      {
+        id: 'V1eYniJ0Rnk',
+        title: 'Andrew Ng - Machine Learning Course',
+        thumbnail: 'https://img.youtube.com/vi/V1eYniJ0Rnk/maxresdefault.jpg',
+        channelTitle: 'Stanford Online',
+        viewCount: '8.5M',
+        publishedAt: '2018-09-17'
+      },
+      {
+        id: 'JN6H4rQvwgY',
+        title: 'Sentdex - Python for Data Science',
+        thumbnail: 'https://img.youtube.com/vi/JN6H4rQvwgY/maxresdefault.jpg',
+        channelTitle: 'Sentdex',
+        viewCount: '2.1M',
+        publishedAt: '2019-03-15'
+      },
+      {
+        id: 'r4mwkS2T9aE',
+        title: 'Lex Fridman - AI Podcast',
+        thumbnail: 'https://img.youtube.com/vi/r4mwkS2T9aE/maxresdefault.jpg',
+        channelTitle: 'Lex Fridman',
+        viewCount: '1.8M',
+        publishedAt: '2020-06-20'
+      },
+      {
+        id: 'O5xeyoRL95U',
+        title: 'Two Minute Papers - AI Research',
+        thumbnail: 'https://img.youtube.com/vi/O5xeyoRL95U/maxresdefault.jpg',
+        channelTitle: 'Two Minute Papers',
+        viewCount: '3.2M',
+        publishedAt: '2021-01-10'
+      }
+    ];
+    setRelatedVideos(dataScienceVideos);
+  };
+
+  useEffect(() => {
+    fetchRelatedVideos();
+  }, []);
+
+  const handleVideoChange = (newVideoId: string) => {
+    window.history.pushState({}, '', `/study/${newVideoId}`);
+    window.location.reload();
+  };
+
   return (
     <div className="min-h-screen bg-youtube-black text-white">
       {/* Study Mode Indicator and Time Display */}
@@ -258,143 +350,35 @@ const StudyMode = () => {
 
       {/* Main Content */}
       <div className="pt-24 px-4">
-        <div className="max-w-7xl mx-auto">
-          {/* Video Player */}
-          <div className="aspect-video bg-black rounded-lg overflow-hidden mb-8">
-            <YouTube
-              videoId={videoId}
-              onReady={onPlayerReady}
-              opts={{
-                height: '100%',
-                width: '100%',
-                playerVars: {
-                  autoplay: 1,
-                  modestbranding: 1,
-                  rel: 0
-                }
-              }}
-            />
-          </div>
-
-          {/* Study Tools */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Notes and Todo List */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Tabs */}
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => setActiveTab('notes')}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
-                    activeTab === 'notes'
-                      ? 'bg-youtube-red text-white'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  <NoteIcon />
-                  <span>Notes</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('todo')}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
-                    activeTab === 'todo'
-                      ? 'bg-youtube-red text-white'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  <ChecklistIcon />
-                  <span>To-Do List</span>
-                </button>
-              </div>
-
-              {/* Notes Tab Content */}
-              {activeTab === 'notes' && (
-                <div className="space-y-4">
-                  <div className="flex space-x-2">
-                    <textarea
-                      ref={textareaRef}
-                      value={currentNote}
-                      onChange={(e) => setCurrentNote(e.target.value)}
-                      placeholder="Take notes..."
-                      className="flex-grow bg-youtube-gray text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red min-h-[100px]"
-                    />
-                    <button
-                      onClick={saveNote}
-                      className="bg-youtube-red text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                    >
-                      <SaveIcon />
-                    </button>
-                  </div>
-
-                  <div className="space-y-2">
-                    {notes.map((note) => (
-                      <div
-                        key={note.id}
-                        className="bg-youtube-gray p-4 rounded-lg"
-                      >
-                        <p className="text-white whitespace-pre-wrap">{note.content}</p>
-                        {note.timestamp && (
-                          <div className="mt-2 text-sm text-gray-400">
-                            Timestamp: {formatTime(note.timestamp)}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Todo List Tab Content */}
-              {activeTab === 'todo' && (
-                <div className="space-y-4">
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      placeholder="Add a new task..."
-                      className="flex-grow bg-youtube-gray text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red"
-                    />
-                    <button
-                      onClick={addTodo}
-                      className="bg-youtube-red text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                    >
-                      <AddIcon />
-                    </button>
-                  </div>
-
-                  <div className="space-y-2">
-                    {todos.map((todo) => (
-                      <div
-                        key={todo.id}
-                        className="flex items-center space-x-3 p-3 bg-youtube-gray rounded-lg"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={todo.completed}
-                          onChange={() => toggleTodo(todo.id)}
-                          className="w-5 h-5 rounded border-gray-600 text-youtube-red focus:ring-youtube-red"
-                        />
-                        <input
-                          type="text"
-                          value={todo.text}
-                          onChange={(e) => updateTodoText(todo.id, e.target.value)}
-                          placeholder="Enter task..."
-                          className="flex-1 bg-transparent border-none focus:outline-none text-white placeholder-gray-500"
-                        />
-                        {todo.timestamp && (
-                          <button
-                            onClick={() => playerRef.current?.seekTo(todo.timestamp)}
-                            className="text-gray-400 hover:text-white"
-                          >
-                            {formatTime(todo.timestamp)}
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+        <div className="max-w-[1600px] mx-auto flex gap-8">
+          {/* Left Column - Video Player and Bookmarks */}
+          <div className="flex-1 space-y-8">
+            {/* Video Player */}
+            <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
+              <YouTube
+                videoId={videoId}
+                onReady={onPlayerReady}
+                onError={onPlayerError}
+                opts={{
+                  width: '100%',
+                  height: '100%',
+                  playerVars: {
+                    autoplay: 1,
+                    modestbranding: 1,
+                    rel: 0,
+                    enablejsapi: 1,
+                    origin: window.location.origin
+                  }
+                }}
+                className="w-full h-full"
+                iframeClassName="w-full h-full"
+              />
             </div>
 
-            {/* Right Column - Bookmarks */}
+            {/* Video Title */}
+            <h1 className="text-2xl font-medium">{videoTitle}</h1>
+
+            {/* Bookmarks */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium">Bookmarks</h3>
@@ -423,6 +407,184 @@ const StudyMode = () => {
                 ))}
               </div>
             </div>
+          </div>
+
+          {/* Right Column - Notes and Todo List */}
+          <div className="w-[400px] space-y-8">
+            {/* Tabs */}
+            <div className="flex space-x-4">
+              <button
+                onClick={() => setActiveTab('notes')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
+                  activeTab === 'notes'
+                    ? 'bg-youtube-red text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <NoteIcon />
+                <span>Notes</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('todo')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
+                  activeTab === 'todo'
+                    ? 'bg-youtube-red text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <ChecklistIcon />
+                <span>To-Do List</span>
+              </button>
+            </div>
+
+            {/* Notes Tab Content */}
+            {activeTab === 'notes' && (
+              <div className="space-y-4">
+                <div className="flex space-x-2">
+                  <textarea
+                    ref={textareaRef}
+                    value={currentNote}
+                    onChange={(e) => setCurrentNote(e.target.value)}
+                    placeholder="Take notes..."
+                    className="flex-grow bg-youtube-gray text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red min-h-[100px]"
+                  />
+                  <button
+                    onClick={saveNote}
+                    className="bg-youtube-red text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                  >
+                    <SaveIcon />
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">
+                  {notes.map((note) => (
+                    <div
+                      key={note.id}
+                      className="bg-youtube-gray p-4 rounded-lg"
+                    >
+                      <p className="text-white whitespace-pre-wrap">{note.content}</p>
+                      {note.timestamp && (
+                        <div className="mt-2 text-sm text-gray-400">
+                          Timestamp: {formatTime(note.timestamp)}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Todo List Tab Content */}
+            {activeTab === 'todo' && (
+              <div className="space-y-4">
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Add a new task..."
+                    className="flex-grow bg-youtube-gray text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red"
+                  />
+                  <button
+                    onClick={addTodo}
+                    className="bg-youtube-red text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                  >
+                    <AddIcon />
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">
+                  {todos.map((todo) => (
+                    <div
+                      key={todo.id}
+                      className="flex items-center space-x-3 p-3 bg-youtube-gray rounded-lg"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={todo.completed}
+                        onChange={() => toggleTodo(todo.id)}
+                        className="w-5 h-5 rounded border-gray-600 text-youtube-red focus:ring-youtube-red"
+                      />
+                      <input
+                        type="text"
+                        value={todo.text}
+                        onChange={(e) => updateTodoText(todo.id, e.target.value)}
+                        placeholder="Enter task..."
+                        className="flex-1 bg-transparent border-none focus:outline-none text-white placeholder-gray-500"
+                      />
+                      {todo.timestamp && (
+                        <button
+                          onClick={() => playerRef.current?.seekTo(todo.timestamp)}
+                          className="text-gray-400 hover:text-white"
+                        >
+                          {formatTime(todo.timestamp)}
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Recommended Videos Section */}
+        <div className="mt-12 max-w-[1600px] mx-auto">
+          <div className="space-y-2">
+            <button
+              onClick={() => setShowRelatedVideos(!showRelatedVideos)}
+              className="flex items-center space-x-2 text-gray-400 hover:text-white"
+            >
+              <VideoLibraryIcon />
+              <span>Recommended Videos</span>
+              <ChevronRightIcon className={`transform transition-transform ${showRelatedVideos ? 'rotate-90' : ''}`} />
+            </button>
+
+            {showRelatedVideos && (
+              <div className="relative bg-youtube-gray rounded-lg">
+                <div className="flex items-center">
+                  <button
+                    onClick={() => scrollSlider('left')}
+                    className="p-2 hover:bg-black hover:bg-opacity-20 rounded-l-lg"
+                  >
+                    <ChevronLeftIcon className="w-5 h-5" />
+                  </button>
+
+                  <div
+                    ref={sliderRef}
+                    className="flex-1 overflow-x-auto scrollbar-hide"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                  >
+                    <div className="flex space-x-2 p-2">
+                      {relatedVideos.map((video) => (
+                        <div
+                          key={video.id}
+                          onClick={() => handleVideoChange(video.id)}
+                          className="flex-shrink-0 w-40 cursor-pointer"
+                        >
+                          <div className="relative aspect-video rounded overflow-hidden">
+                            <img
+                              src={video.thumbnail}
+                              alt={video.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="mt-1">
+                            <h3 className="text-xs font-medium line-clamp-2">{video.title}</h3>
+                            <p className="text-[10px] text-gray-400">{video.channelTitle}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => scrollSlider('right')}
+                    className="p-2 hover:bg-black hover:bg-opacity-20 rounded-r-lg"
+                  >
+                    <ChevronRightIcon className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
