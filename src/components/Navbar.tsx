@@ -19,13 +19,15 @@ const Navbar = () => {
         >
           <MenuIcon />
         </button>
-        <Link to="/" className="flex items-center">
+        <Link to="/" className="flex items-center min-w-[120px]">
+          <div className="flex items-center">
           <img
             src="/youtube-logo.svg"
             alt="YouTube"
-            className="h-6"
+              className="h-6 w-auto"
           />
-          <span className="text-white text-xl font-semibold -ml-1">YouTube</span>
+            <span className="text-white text-xl font-semibold ml-1">YouTube</span>
+          </div>
         </Link>
       </div>
 

@@ -56,7 +56,7 @@ const StudyMode = () => {
   const { videoId } = useParams();
   const navigate = useNavigate();
   const { isOpen, toggleSidebar } = useSidebarStore();
-  const [activeTab, setActiveTab] = useState<'notes' | 'todo'>('notes');
+  const [activeTab, setActiveTab] = useState('notes');
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -71,6 +71,40 @@ const StudyMode = () => {
   const [relatedVideos, setRelatedVideos] = useState<RelatedVideo[]>([]);
   const [showRelatedVideos, setShowRelatedVideos] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
+  const [transcripts, setTranscripts] = useState([
+    {
+      time: '00:00',
+      text: 'Welcome to this comprehensive course on Machine Learning. In this video, we\'ll cover the fundamentals of neural networks.'
+    },
+    {
+      time: '00:15',
+      text: 'First, let\'s understand what a neural network is. At its core, a neural network is a series of algorithms that endeavors to recognize underlying relationships in a set of data through a process that mimics the way the human brain operates.'
+    },
+    {
+      time: '00:45',
+      text: 'The basic building block of a neural network is the neuron. Each neuron receives input, processes it, and generates an output that is sent to other neurons.'
+    },
+    {
+      time: '01:20',
+      text: 'Let\'s look at a simple example. Suppose we want to predict whether an email is spam or not. We can use a neural network to learn patterns from labeled data.'
+    },
+    {
+      time: '02:00',
+      text: 'The network consists of three main layers: the input layer, hidden layers, and the output layer. Each layer performs specific transformations on the data.'
+    },
+    {
+      time: '02:30',
+      text: 'The input layer receives the raw data, such as the words in an email. The hidden layers process this information, and the output layer gives us the final prediction.'
+    },
+    {
+      time: '03:15',
+      text: 'During training, the network adjusts its weights and biases to minimize the difference between its predictions and the actual labels.'
+    },
+    {
+      time: '04:00',
+      text: 'This process is called backpropagation, and it\'s what allows neural networks to learn from their mistakes and improve over time.'
+    }
+  ]);
 
   // Load saved data when component mounts
   useEffect(() => {
@@ -329,7 +363,7 @@ const StudyMode = () => {
   return (
     <div className="min-h-screen bg-youtube-black text-white">
       {/* Study Mode Indicator and Time Display */}
-      <div className="fixed top-16 left-0 right-0 z-50 flex items-center justify-end px-4">
+      <div className="fixed top-16 left-0 right-0 z-50 flex items-center justify-end px-4 bg-youtube-black bg-opacity-90 backdrop-blur-sm">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -343,18 +377,18 @@ const StudyMode = () => {
           animate={{ opacity: 1 }}
           className="ml-4 flex items-center space-x-2"
         >
-          <AccessTimeIcon className="text-gray-400" />
-          <span className="text-gray-400">{currentTime}</span>
+          <AccessTimeIcon className="text-white" />
+          <span className="text-white">{currentTime}</span>
         </motion.div>
       </div>
 
       {/* Main Content */}
-      <div className="pt-24 px-4">
-        <div className="max-w-[1600px] mx-auto flex gap-8">
+      <div className="pt-20 px-4">
+        <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-8">
           {/* Left Column - Video Player and Bookmarks */}
-          <div className="flex-1 space-y-8">
+          <div className={`${!isOpen ? 'lg:flex-[2]' : 'lg:flex-1'} space-y-8`}>
             {/* Video Player */}
-            <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
+            <div className="aspect-video bg-black rounded-lg overflow-hidden shadow-2xl w-full">
               <YouTube
                 videoId={videoId}
                 onReady={onPlayerReady}
@@ -378,8 +412,8 @@ const StudyMode = () => {
             {/* Video Title */}
             <h1 className="text-2xl font-medium">{videoTitle}</h1>
 
-            {/* Bookmarks */}
-            <div className="space-y-4">
+            {/* Bookmarks - Only show on larger screens */}
+            <div className="hidden lg:block space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium">Bookmarks</h3>
                 <button
@@ -410,119 +444,158 @@ const StudyMode = () => {
           </div>
 
           {/* Right Column - Notes and Todo List */}
-          <div className="w-[400px] space-y-8">
-            {/* Tabs */}
-            <div className="flex space-x-4">
-              <button
-                onClick={() => setActiveTab('notes')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
-                  activeTab === 'notes'
-                    ? 'bg-youtube-red text-white'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <NoteIcon />
-                <span>Notes</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('todo')}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
-                  activeTab === 'todo'
-                    ? 'bg-youtube-red text-white'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <ChecklistIcon />
-                <span>To-Do List</span>
-              </button>
+          <div className="lg:w-[400px] space-y-8">
+            {/* Tabs - Fixed at bottom on mobile */}
+            <div className="fixed bottom-0 left-0 right-0 bg-youtube-black z-50 lg:static lg:bg-transparent">
+              <div className="flex justify-around lg:justify-start lg:space-x-4 p-2 lg:p-0">
+                <button
+                  onClick={() => setActiveTab('notes')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
+                    activeTab === 'notes'
+                      ? 'bg-youtube-red text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <NoteIcon />
+                  <span className="hidden lg:inline">Notes</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('todo')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
+                    activeTab === 'todo'
+                      ? 'bg-youtube-red text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <ChecklistIcon />
+                  <span className="hidden lg:inline">To-Do</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('transcripts')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
+                    activeTab === 'transcripts'
+                      ? 'bg-youtube-red text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <NoteIcon />
+                  <span className="hidden lg:inline">Transcripts</span>
+                </button>
+              </div>
             </div>
 
-            {/* Notes Tab Content */}
-            {activeTab === 'notes' && (
-              <div className="space-y-4">
-                <div className="flex space-x-2">
-                  <textarea
-                    ref={textareaRef}
-                    value={currentNote}
-                    onChange={(e) => setCurrentNote(e.target.value)}
-                    placeholder="Take notes..."
-                    className="flex-grow bg-youtube-gray text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red min-h-[100px]"
-                  />
-                  <button
-                    onClick={saveNote}
-                    className="bg-youtube-red text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                  >
-                    <SaveIcon />
-                  </button>
-                </div>
-
-                <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">
-                  {notes.map((note) => (
-                    <div
-                      key={note.id}
-                      className="bg-youtube-gray p-4 rounded-lg"
+            {/* Tab Content - Show below video on mobile */}
+            <div className="lg:block">
+              {/* Notes Tab Content */}
+              {activeTab === 'notes' && (
+                <div className="space-y-4">
+                  <div className="flex space-x-2">
+                    <textarea
+                      ref={textareaRef}
+                      value={currentNote}
+                      onChange={(e) => setCurrentNote(e.target.value)}
+                      placeholder="Take notes..."
+                      className="flex-grow bg-youtube-gray text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red min-h-[100px]"
+                    />
+                    <button
+                      onClick={saveNote}
+                      className="bg-youtube-red text-white px-4 py-2 rounded-lg hover:bg-red-600"
                     >
-                      <p className="text-white whitespace-pre-wrap">{note.content}</p>
-                      {note.timestamp && (
-                        <div className="mt-2 text-sm text-gray-400">
-                          Timestamp: {formatTime(note.timestamp)}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                      <SaveIcon />
+                    </button>
+                  </div>
 
-            {/* Todo List Tab Content */}
-            {activeTab === 'todo' && (
-              <div className="space-y-4">
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    placeholder="Add a new task..."
-                    className="flex-grow bg-youtube-gray text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red"
-                  />
-                  <button
-                    onClick={addTodo}
-                    className="bg-youtube-red text-white px-4 py-2 rounded-lg hover:bg-red-600"
-                  >
-                    <AddIcon />
-                  </button>
+                  <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">
+                    {notes.map((note) => (
+                      <div
+                        key={note.id}
+                        className="bg-youtube-gray p-4 rounded-lg"
+                      >
+                        <p className="text-white whitespace-pre-wrap">{note.content}</p>
+                        {note.timestamp && (
+                          <div className="mt-2 text-sm text-gray-400">
+                            Timestamp: {formatTime(note.timestamp)}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              )}
 
-                <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">
-                  {todos.map((todo) => (
-                    <div
-                      key={todo.id}
-                      className="flex items-center space-x-3 p-3 bg-youtube-gray rounded-lg"
+              {/* Todo List Tab Content */}
+              {activeTab === 'todo' && (
+                <div className="space-y-4">
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Add a new task..."
+                      className="flex-grow bg-youtube-gray text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red"
+                    />
+                    <button
+                      onClick={addTodo}
+                      className="bg-youtube-red text-white px-4 py-2 rounded-lg hover:bg-red-600"
                     >
-                      <input
-                        type="checkbox"
-                        checked={todo.completed}
-                        onChange={() => toggleTodo(todo.id)}
-                        className="w-5 h-5 rounded border-gray-600 text-youtube-red focus:ring-youtube-red"
-                      />
-                      <input
-                        type="text"
-                        value={todo.text}
-                        onChange={(e) => updateTodoText(todo.id, e.target.value)}
-                        placeholder="Enter task..."
-                        className="flex-1 bg-transparent border-none focus:outline-none text-white placeholder-gray-500"
-                      />
-                      {todo.timestamp && (
-                        <button
-                          onClick={() => playerRef.current?.seekTo(todo.timestamp)}
-                          className="text-gray-400 hover:text-white"
-                        >
-                          {formatTime(todo.timestamp)}
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                      <AddIcon />
+                    </button>
+                  </div>
+
+                  <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">
+                    {todos.map((todo) => (
+                      <div
+                        key={todo.id}
+                        className="flex items-center space-x-3 p-3 bg-youtube-gray rounded-lg"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={todo.completed}
+                          onChange={() => toggleTodo(todo.id)}
+                          className="w-5 h-5 rounded border-gray-600 text-youtube-red focus:ring-youtube-red"
+                        />
+                        <input
+                          type="text"
+                          value={todo.text}
+                          onChange={(e) => updateTodoText(todo.id, e.target.value)}
+                          placeholder="Enter task..."
+                          className="flex-1 bg-transparent border-none focus:outline-none text-white placeholder-gray-500"
+                        />
+                        {todo.timestamp && (
+                          <button
+                            onClick={() => playerRef.current?.seekTo(todo.timestamp)}
+                            className="text-gray-400 hover:text-white"
+                          >
+                            {formatTime(todo.timestamp)}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+
+              {/* Transcripts Tab Content */}
+              {activeTab === 'transcripts' && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    {transcripts.map((transcript, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start space-x-2 p-3 bg-youtube-black rounded-lg hover:bg-gray-800 cursor-pointer"
+                        onClick={() => {
+                          if (playerRef.current) {
+                            const [minutes, seconds] = transcript.time.split(':').map(Number)
+                            playerRef.current.seekTo(minutes * 60 + seconds)
+                          }
+                        }}
+                      >
+                        <span className="text-youtube-red text-sm min-w-[50px]">{transcript.time}</span>
+                        <p className="text-white">{transcript.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

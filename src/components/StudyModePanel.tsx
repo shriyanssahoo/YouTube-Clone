@@ -38,7 +38,7 @@ const StudyModePanel = () => {
   ]
 
   return (
-    <div className="bg-youtube-gray rounded-lg p-4">
+    <div className="bg-youtube-gray rounded-lg p-4 w-[400px]">
       {/* Tabs */}
       <div className="flex space-x-4 mb-4">
         {tabs.map((tab) => (
@@ -118,15 +118,9 @@ const StudyModePanel = () => {
             {todos.map((todo, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 bg-youtube-black rounded-lg"
+                className="flex items-start justify-between p-3 bg-youtube-black rounded-lg"
               >
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    className="w-5 h-5 rounded border-gray-600 text-youtube-red focus:ring-youtube-red"
-                  />
-                  <span className="text-white">{todo}</span>
-                </div>
+                <p className="text-white">{todo}</p>
                 <button
                   onClick={() => removeTodo(index)}
                   className="text-gray-400 hover:text-white"

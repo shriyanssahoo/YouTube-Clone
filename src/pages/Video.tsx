@@ -1,17 +1,25 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useLikedVideosStore } from '../store/likedVideosStore'
 import { useStudyModeStore } from '../store/studyModeStore'
 import StudyModeToggle from '../components/StudyModeToggle'
 import StudyModePanel from '../components/StudyModePanel'
+import MiniPlayer from '../components/MiniPlayer'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp'
 import ThumbDownIcon from '@mui/icons-material/ThumbDown'
 import ShareIcon from '@mui/icons-material/Share'
 import SaveIcon from '@mui/icons-material/Save'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import PauseIcon from '@mui/icons-material/Pause'
+import SkipNextIcon from '@mui/icons-material/SkipNext'
+import SkipPreviousIcon from '@mui/icons-material/SkipPrevious'
+import VolumeUpIcon from '@mui/icons-material/VolumeUp'
+import VolumeOffIcon from '@mui/icons-material/VolumeOff'
 
 const Video = () => {
   const { id } = useParams()
+  const videoRef = useRef<HTMLIFrameElement>(null)
   const [videoData, setVideoData] = useState({
     id: '',
     title: '',
@@ -21,8 +29,10 @@ const Video = () => {
     description: '',
     thumbnail: ''
   })
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isMuted, setIsMuted] = useState(false)
   const { addLikedVideo, removeLikedVideo, isLiked: isVideoLiked } = useLikedVideosStore()
-  const { isActive: isStudyModeActive } = useStudyModeStore()
+  const { isActive: isStudyModeActive, activeTab, setActiveTab } = useStudyModeStore()
 
   useEffect(() => {
     // In a real app, this would fetch from an API
@@ -36,6 +46,38 @@ const Video = () => {
       thumbnail: 'https://picsum.photos/seed/video/320/180'
     })
   }, [id])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case ' ':
+        case 'k':
+          e.preventDefault()
+          setIsPlaying(prev => !prev)
+          // In a real app, this would control the video player
+          break
+        case 'n':
+          e.preventDefault()
+          setActiveTab(activeTab === 'notes' ? 'todos' : 'notes')
+          break
+        case 'ArrowRight':
+          e.preventDefault()
+          // Skip forward 5 seconds
+          break
+        case 'ArrowLeft':
+          e.preventDefault()
+          // Skip backward 5 seconds
+          break
+        case 'm':
+          e.preventDefault()
+          setIsMuted(prev => !prev)
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [activeTab, setActiveTab])
 
   const handleLike = () => {
     if (isVideoLiked(videoData.id)) {
@@ -53,15 +95,38 @@ const Video = () => {
   return (
     <div className="flex flex-col lg:flex-row gap-4 p-4">
       {/* Main Content */}
-      <div className={`flex-1 ${isStudyModeActive ? 'lg:w-2/3' : 'lg:w-full'}`}>
-        <div className="aspect-video bg-black rounded-lg overflow-hidden">
+      <div className={`flex-1 ${isStudyModeActive ? 'lg:w-[70vw]' : 'lg:w-full'}`}>
+        <div className="aspect-video bg-black rounded-lg overflow-hidden video-player relative w-[70vw] max-w-[800px] mx-auto">
           <iframe
-            src={`https://www.youtube.com/embed/${id}`}
+            ref={videoRef}
+            src={`https://www.youtube.com/embed/${id}?autoplay=1`}
             title="YouTube video player"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             className="w-full h-full"
           ></iframe>
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 to-transparent">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setIsPlaying(prev => !prev)}
+                className="text-white hover:text-gray-300"
+              >
+                {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+              </button>
+              <button
+                onClick={() => setIsMuted(prev => !prev)}
+                className="text-white hover:text-gray-300"
+              >
+                {isMuted ? <VolumeOffIcon /> : <VolumeUpIcon />}
+              </button>
+              <button className="text-white hover:text-gray-300">
+                <SkipPreviousIcon />
+              </button>
+              <button className="text-white hover:text-gray-300">
+                <SkipNextIcon />
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="mt-4">
@@ -99,14 +164,14 @@ const Video = () => {
                 <SaveIcon />
                 <span>Save</span>
               </button>
-              <button className="text-gray-400 hover:text-white">
+              <button className="flex items-center space-x-1 text-gray-400 hover:text-white">
                 <MoreHorizIcon />
               </button>
             </div>
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-youtube-gray rounded-lg">
+        <div className="mt-4">
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-gray-600 rounded-full"></div>
             <div>
@@ -125,10 +190,13 @@ const Video = () => {
 
       {/* Study Mode Panel */}
       {isStudyModeActive && (
-        <div className="lg:w-1/3 h-[calc(100vh-8rem)]">
+        <div className="lg:flex-1">
           <StudyModePanel />
         </div>
       )}
+
+      {/* Mini Player */}
+      <MiniPlayer />
     </div>
   )
 }

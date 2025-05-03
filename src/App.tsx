@@ -54,8 +54,10 @@ const App = () => {
       <div className={`transition-opacity duration-500 ${showWelcome ? 'opacity-0' : 'opacity-100'}`}>
         <Navbar />
         <div className="flex pt-16">
+          <div className="fixed left-0 top-16 h-[calc(100vh-4rem)] z-40">
           <Sidebar />
-          <main className={`flex-1 transition-all duration-300 ${isOpen ? 'ml-64' : 'ml-20'}`}>
+          </div>
+          <main className={`flex-1 transition-all duration-300 ${isOpen ? 'ml-64' : 'ml-20'} min-h-[calc(100vh-4rem)]`}>
             <div className="p-4">
               <Routes>
                 <Route path="/" element={<Home />} />
