@@ -5,6 +5,14 @@ import AssignmentIcon from '@mui/icons-material/Assignment'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
 
+type TabType = 'notes' | 'todos'
+
+interface Tab {
+  id: TabType
+  label: string
+  icon: React.ReactNode
+}
+
 const StudyModePanel = () => {
   const { activeTab, setActiveTab, todos, notes, addTodo, removeTodo, addNote, removeNote } = useStudyModeStore()
   const [newTodo, setNewTodo] = useState('')
@@ -24,7 +32,7 @@ const StudyModePanel = () => {
     }
   }
 
-  const tabs = [
+  const tabs: Tab[] = [
     { id: 'notes', label: 'Notes', icon: <NoteIcon /> },
     { id: 'todos', label: 'To-Do List', icon: <AssignmentIcon /> },
   ]

@@ -56,7 +56,7 @@ interface StudyModeState {
 
 export const useStudyModeStore = create<StudyModeState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       isActive: false,
       currentSession: null,
       sessions: [],

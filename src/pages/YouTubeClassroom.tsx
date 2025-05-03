@@ -183,7 +183,6 @@ const YouTubeClassroom = () => {
   const [isClearingCompleted, setIsClearingCompleted] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
   const slidesPerView = 3
-  const totalSlides = Math.ceil(courses.length / slidesPerView)
 
   const handleAddTask = () => {
     if (newTask.title && newTask.course && newTask.dueDate) {
