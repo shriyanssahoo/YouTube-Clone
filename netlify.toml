@@ -1,8 +1,13 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  node_version = "18"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
+
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "9" 
